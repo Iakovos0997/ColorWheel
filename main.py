@@ -1,16 +1,7 @@
 from graphics import *
-import math, colorsys
+import math, colorsys, button, ColorWheel
 
-win = GraphWin("Color Wheel", 900, 600)
+win = GraphWin("Color Wheel", 600, 600, autoflush=False)
 
-# Areas and Sizes
-cx, cy, R = 300, 300, 250
-Circle(Point(cx, cy), R).draw(win)
-
-panel = Rectangle(Point(600, 40), Point(880, 560))
-panel.setOutline("gray")
-panel.draw(win)
-Text(Point(740, 60), "Selection Panel").draw(win)
-
-win.getMouse()
-win.Close()
+wheel = ColorWheel.ColorWheel(win, step=3)
+wheel.run()
