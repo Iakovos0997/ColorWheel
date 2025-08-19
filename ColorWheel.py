@@ -18,7 +18,7 @@ class ColorWheel:
         self.colorPreview = None
         self.text_rgb = None
         self.marker = None
-        self.quit_button = None
+        self.quit = None
 
         self._makeColorWheel()
 
@@ -41,7 +41,6 @@ class ColorWheel:
         self._addColors()
         self._addLabels()
         self._addMarker()
-        self._addQuitButton()  # <-- add quit button here
 
     def _drawOutlineCircle(self):
         Circle(Point(self.cx, self.cy), self.radius).draw(self.window)
@@ -87,21 +86,20 @@ class ColorWheel:
         self.marker.setWidth(2)
         self.marker.draw(self.window)
 
-    def _addQuitButton(self):
-        """Add a button that quits the color wheel."""
-        self.quit_button = Button(self.window, Point(int(self.cx), int(self.height * 0.95)), 80, 30, "Quit")
-        self.quit_button.activate()
+    def _quit(self):
+        self.quit = True
 
     # ---------- Interaction Loop ----------
 
     def run(self):
+        self.quit = False
         while True:
             p = self.window.getMouse()
             if p is None:
                 break
 
             # Check quit button first
-            if self.quit_button.clicked(p):
+            if self.quit:
                 break
 
             x, y = p.getX(), p.getY()
@@ -119,3 +117,19 @@ class ColorWheel:
                 self._draw_marker(p)
 
         self.window.close()
+
+    def handle_click(self, p: Point):
+        """Handle a click inside the wheel area."""
+        x, y = p.getX(), p.getY()
+        dx, dy = x - self.cx, y - self.cy
+        r = math.hypot(dx, dy)
+
+        if r <= self.radius:
+            hue = (math.degrees(math.atan2(dy, dx)) + 360) % 360
+            s = r / self.radius
+            R8, G8, B8 = self._hsv_to_rgb(hue, s, 1.0)
+
+            col = color_rgb(R8, G8, B8)
+            self.colorPreview.setFill(col)
+            self.text_rgb.setText(f"RGB: ({R8}, {G8}, {B8})")
+            self._draw_marker(p)
